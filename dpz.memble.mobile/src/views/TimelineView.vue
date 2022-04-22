@@ -1,4 +1,9 @@
 <template>
+  <van-overlay :show="showDelete" z-index="2">
+    <div class="wrapper">
+      <van-loading>正在删除...</van-loading>
+    </div>
+  </van-overlay>
   <van-nav-bar title="我的时间轴"/>
   <div style="padding: 0.5em">
     <van-skeleton row="5" :loading="isLoading">
@@ -50,6 +55,8 @@
 <script>
 import dayjs from "dayjs";
 import Prism from "prismjs";
+import {Dialog} from "vant";
+import {success} from "@/common";
 
 export default {
   name: "TimelineView",
@@ -60,7 +67,8 @@ export default {
       total: 0,
       content: "",
       isLoading: true,
-      activeNames: []
+      activeNames: [],
+      showDelete: false,
     }
   },
   async mounted() {
@@ -70,6 +78,9 @@ export default {
     Prism.highlightAll();
   },
   methods: {
+    /**
+     * 加载时间轴列表
+     * */
     async loadTimeline() {
       this.isLoading = true;
       let response = await fetch(`https://localhost:37701/Timeline/MyTimeline?pageIndex=${this.pageIndex}&content=${encodeURIComponent(this.content)}`);
@@ -85,15 +96,39 @@ export default {
       this.total = result.totalCount;
       this.isLoading = false;
     },
+    /**
+     * 展示时间轴内容
+     * */
     showMarkdown(mumble) {
       mumble.isShowMk = mumble.isShowMk ? !mumble.isShowMk : true;
     },
+    /**
+     * 导航到编辑时间轴
+     * */
     editTimeline(timeline) {
       this.$router.push({name: "edit-timeline", params: {id: timeline.id}});
     },
-    deleteTimeline() {
-
+    /**
+     * 删除时间轴
+     * */
+    async deleteTimeline(timeline) {
+      await Dialog.confirm({title: "title", message: `删除后不可恢复，确定要删除《${timeline.title}》吗？`});
+      this.showDelete = true;
+      let formData = new FormData();
+      formData.append("id", timeline.id);
+      let response = await fetch("/Timeline/Delete", {
+        method: "post",
+        body: formData
+      });
+      let that = this;
+      await this.$handleResponse(response,() => that.showDelete = false);
+      success("删除成功");
+      await this.loadTimeline();
+      this.showDelete = false;
     },
+    /**
+     * 翻页
+     * */
     async toPage() {
       await this.loadTimeline();
     }

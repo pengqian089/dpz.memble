@@ -24,7 +24,7 @@ export default {
 
 <style>
 body {
-  background: #181616;
+  background: #404444;
 }
 
 #app {
@@ -51,5 +51,11 @@ pre {
 
 .list-item {
   margin-bottom: 1em;
+}
+
+.wrapper{
+  top: 50%;
+  right: 50%;
+  position: absolute;
 }
 </style>

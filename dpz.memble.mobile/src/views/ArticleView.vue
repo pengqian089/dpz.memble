@@ -1,4 +1,10 @@
 <template>
+
+  <van-overlay :show="showDelete" z-index="2">
+    <div class="wrapper">
+      <van-loading>正在删除...</van-loading>
+    </div>
+  </van-overlay>
   <van-nav-bar title="我的文章"/>
   <div style="padding:0.5em">
     <van-skeleton row="5" :loading="isLoading">
@@ -68,10 +74,9 @@
 </template>
 
 <script>
-//import Article from "../data/article";
 import Prism from "prismjs";
 import dayjs from "dayjs";
-import {Dialog, Notify} from "vant";
+import {Dialog} from "vant";
 
 export default {
   name: "ArticleView",
@@ -85,7 +90,8 @@ export default {
       activeNames: [],
       isLoading: true,
       tags: [],
-      showTag: false
+      showTag: false,
+      showDelete: false,
     };
   },
   async mounted() {
@@ -96,22 +102,36 @@ export default {
     Prism.highlightAll();
   },
   methods: {
+    /**
+     * 展示文章markdown内容
+     * */
     showMarkdown(article) {
       article.isShowMk = article.isShowMk ? !article.isShowMk : true;
     },
+    /**
+     * 导航到编辑文章
+     * */
     editArticle(article) {
       this.$router.push({name: `edit-article`, params: {id: article.id}});
     },
+    /**
+     * 删除文章
+     * */
     async deleteArticle(article) {
       await Dialog.confirm({title: "提示", message: `删除后不可恢复，确定要删除《${article.blogTitle}》吗？`});
 
+      this.showDelete = true;
       let formData = new FormData();
       formData.append("id", article.id);
       let response = await fetch("/Article/Delete", {method: "post", body: formData});
-      await this.$handleResponse(response);
+      let that = this;
+      await this.$handleResponse(response, () => that.showDelete = false);
+      this.showDelete = false;
       await this.loadArticles();
     },
-
+    /**
+     * 加载文章列表
+     * */
     async loadArticles() {
       this.isLoading = true;
       let response = await fetch(`https://localhost:37701/Article/MyArticle?pageIndex=${this.pageIndex}&title=${encodeURIComponent(this.title)}&tag=${encodeURIComponent(this.tag)}`);
@@ -126,28 +146,32 @@ export default {
       this.total = result.totalCount;
       this.isLoading = false;
     },
+    /**
+     * 加载文章标签
+     * */
     async loadTags() {
       let response = await fetch(`https://localhost:37701/Article/Tags`);
-      if (response.ok) {
-        let result = await response.json();
-        if (result.success) {
-          for (let item of result.data) {
-            this.tags.push({text: item, value: item});
-          }
-        } else {
-          Notify({type: "warning", message: result.msg});
-        }
-      } else {
-        Notify({type: "warning", message: response.statusText});
+      let result = await this.$handleResponse(response);
+      for (let item of result) {
+        this.tags.push({text: item, value: item});
       }
     },
+    /**
+     * 翻页
+     * */
     async toPage() {
       await this.loadArticles();
     },
+    /**
+     * 确定选择标签
+     * */
     pickTag(selected) {
       this.showTag = false;
       this.tag = selected.selectedOptions[0].text;
     },
+    /**
+     * 取消选择标签
+     * */
     cancelPick() {
       this.tag = "";
       this.showTag = false;
