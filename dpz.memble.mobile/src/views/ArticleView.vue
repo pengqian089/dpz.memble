@@ -43,7 +43,7 @@
           :finished="true"
           v-for="item in list" :key="item.id"
       >
-        <van-cell title="标题" :value="item.blogTitle"/>
+        <van-cell title="标题" is-link :value="item.blogTitle" :url="`/article/read/${item.id}.html`"/>
         <van-cell title="回复量" :value="item.commentCount"/>
         <van-cell title="访问次数" :value="item.viewCount"/>
         <van-cell title="标签" :value="item.tag"/>

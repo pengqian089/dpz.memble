@@ -1,5 +1,5 @@
 <template>
-  <van-nav-bar title="基础设置"/>
+  <van-nav-bar title="基础设置" left-text="首页" left-arrow @click-left="toHome"/>
   <van-skeleton row="5" :loading="isLoading">
     <van-tabs v-model:active="active">
       <van-tab title="我的资料">
@@ -233,6 +233,12 @@ export default {
       this.userInfo = await this.$handleResponse(response,() => that.isLoading = false);
       this.userInfo.sex = this.userInfo.sex.toString();
       this.isLoading = false;
+    },
+    /**
+     * 回到首页
+     * */
+    toHome(){
+      location.href = "/";
     }
   }
 }
