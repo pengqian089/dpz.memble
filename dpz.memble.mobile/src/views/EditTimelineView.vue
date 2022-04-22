@@ -98,7 +98,7 @@ export default {
   },
   methods: {
     async getTimeline() {
-      let response = await fetch(`https://localhost:37701/Timeline/Detail/${this.id}`);
+      let response = await fetch(`/Timeline/Detail/${this.id}`);
       this.timeline = await this.$handleResponse(response);
       this.timeline.date = dayjs(this.timeline.date).format("YYYY/MM/DD");
     },

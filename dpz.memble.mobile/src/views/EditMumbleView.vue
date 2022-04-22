@@ -72,7 +72,7 @@ export default {
   },
   methods: {
     async loadMumble() {
-      let response = await fetch(`https://localhost:37701/Talk/Detail/${this.id}`);
+      let response = await fetch(`/Talk/Detail/${this.id}`);
       this.mumble = await this.$handleResponse(response);
     },
     async uploadImage(files, callback) {

@@ -6,7 +6,7 @@
         <van-cell-group inset>
           <van-field
               v-model="article.blogTitle"
-              name="title"
+              name="blogTitle"
               label="标题"
               placeholder="标题"
               :rules="[{ required: true, message: '请输入标题' }]"
@@ -25,7 +25,7 @@
             <van-picker
                 :columns="tags"
                 :loading="tagLoading"
-                @cancel="showTag = false"
+                @cancel="cancelPick"
                 @confirm="pickTag"
             />
           </van-popup>
@@ -38,7 +38,7 @@
           <van-field
               v-model="article.introduction"
               rows="3"
-              name="sign"
+              name="introduction"
               autosize
               label="文章简介"
               type="textarea"
@@ -201,7 +201,7 @@ export default {
      * 加载标签选项
      * */
     async loadTags() {
-      let response = await fetch(`https://localhost:37701/Article/Tags`);
+      let response = await fetch(`/Article/Tags`);
       let result = await this.$handleResponse(response);
       let tags = [];
       for (let item of result) {
@@ -214,8 +214,15 @@ export default {
      * 加载文章详情
      * */
     async loadArticle() {
-      let response = await fetch(`https://localhost:37701/Article/Detail/${this.id}`);
+      let response = await fetch(`/Article/Detail/${this.id}`);
       this.article = await this.$handleResponse(response);
+    },
+    /**
+     * 取消选择标签
+     * */
+    cancelPick(){
+      this.showTag = false;
+      this.tag = "";
     }
   }
 }

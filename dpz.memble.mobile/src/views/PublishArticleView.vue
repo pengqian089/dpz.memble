@@ -24,7 +24,7 @@
           <van-picker
               :columns="tags"
               :loading="tagLoading"
-              @cancel="showTag = false"
+              @cancel="cancelPick"
               @confirm="pickTag"
           />
         </van-popup>
@@ -37,7 +37,7 @@
         <van-field
             v-model="article.introduction"
             rows="3"
-            name="ntroduction"
+            name="introduction"
             autosize
             label="文章简介"
             type="textarea"
@@ -188,7 +188,7 @@ export default {
      * 加载标签选项
      * */
     async loadTags() {
-      let response = await fetch(`https://localhost:37701/Article/Tags`);
+      let response = await fetch(`/Article/Tags`);
       let result = await this.$handleResponse(response);
       let tags = [];
       for (let item of result) {
@@ -197,6 +197,13 @@ export default {
       this.tags = tags;
       this.tagLoading = false;
     },
+    /**
+     * 取消选择标签
+     * */
+    async cancelPick(){
+      this.showTag = false;
+      this.tag = "";
+    }
   }
 }
 </script>

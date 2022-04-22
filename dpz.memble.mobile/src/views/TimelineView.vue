@@ -83,7 +83,7 @@ export default {
      * */
     async loadTimeline() {
       this.isLoading = true;
-      let response = await fetch(`https://localhost:37701/Timeline/MyTimeline?pageIndex=${this.pageIndex}&content=${encodeURIComponent(this.content)}`);
+      let response = await fetch(`/Timeline/MyTimeline?pageIndex=${this.pageIndex}&content=${encodeURIComponent(this.content)}`);
       let result = await this.$handleResponse(response);
       for (let item of result.list) {
         item.lastUpdateTime = dayjs(item.lastUpdateTime).format("YYYY年MM月DD日 HH:mm:ss");

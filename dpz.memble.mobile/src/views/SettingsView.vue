@@ -189,12 +189,11 @@ export default {
     },
     /**
      * 上传头像
-     * @param {File} file
      * */
     async uploadAvatar(file) {
       this.uploading = true;
       let formData = new FormData();
-      formData.append("avatar", file);
+      formData.append("avatar", file.file);
       let response = await fetch("/account/UpdateAvatar", {
         method: "post",
         body: formData
@@ -229,8 +228,9 @@ export default {
      * */
     async getUserInfo() {
       this.isLoading = true;
-      let response = await fetch("https://localhost:37701/account/GetUserInfo");
-      this.userInfo = await this.$handleResponse(response);
+      let response = await fetch("/account/GetUserInfo");
+      let that = this;
+      this.userInfo = await this.$handleResponse(response,() => that.isLoading = false);
       this.userInfo.sex = this.userInfo.sex.toString();
       this.isLoading = false;
     }

@@ -134,7 +134,7 @@ export default {
      * */
     async loadArticles() {
       this.isLoading = true;
-      let response = await fetch(`https://localhost:37701/Article/MyArticle?pageIndex=${this.pageIndex}&title=${encodeURIComponent(this.title)}&tag=${encodeURIComponent(this.tag)}`);
+      let response = await fetch(`/Article/MyArticle?pageIndex=${this.pageIndex}&title=${encodeURIComponent(this.title)}&tag=${encodeURIComponent(this.tag)}`);
       let result = await this.$handleResponse(response);
       for (let item of result.list) {
         item.lastUpdateTime = dayjs(item.lastUpdateTime).format("YYYY年MM月DD日 HH:mm:ss");
@@ -150,7 +150,7 @@ export default {
      * 加载文章标签
      * */
     async loadTags() {
-      let response = await fetch(`https://localhost:37701/Article/Tags`);
+      let response = await fetch(`/Article/Tags`);
       let result = await this.$handleResponse(response);
       for (let item of result) {
         this.tags.push({text: item, value: item});
