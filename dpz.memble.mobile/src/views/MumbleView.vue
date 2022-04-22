@@ -7,7 +7,7 @@
           <van-cell-group inset>
             <van-field v-model="content" label="内容" placeholder="内容"/>
             <div class="query-action">
-              <van-button type="success">发布碎碎念</van-button>
+              <van-button type="success" @click="this.$router.push({name:'publish-mumble'})">发布碎碎念</van-button>
               <van-button type="primary" @click="loadMumble">查询</van-button>
             </div>
           </van-cell-group>

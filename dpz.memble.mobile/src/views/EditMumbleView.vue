@@ -112,6 +112,7 @@ export default {
       }
 
       let formData = new FormData();
+      formData.append("id", this.id);
       formData.append("markdown", this.mumble.markdown);
       formData.append("html", this.mumble.htmlContent);
 
@@ -124,7 +125,7 @@ export default {
       this.publishing = false;
       await this.$router.push({name: "mumble"});
     },
-    back(){
+    back() {
       history.back();
     }
   }

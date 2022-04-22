@@ -1,67 +1,69 @@
 <template>
   <van-nav-bar left-text="返回" left-arrow title="编辑文章" @click="back"/>
   <div style="padding:0.5em">
-    <van-form @submit="publish" class="content">
-      <van-cell-group inset>
-        <van-field
-            v-model="article.blogTitle"
-            name="blogTitle"
-            label="标题"
-            placeholder="标题"
-            :rules="[{ required: true, message: '请输入标题' }]"
-        />
-        <van-field
-            v-model="article.tag"
-            name="tag"
-            is-link
-            readonly
-            label="标签"
-            placeholder="选择选择标签"
-            @click="showTag = true"
-            :rules="[{ required: true, message: '请选择标签' }]"
-        />
-        <van-popup v-model:show="showTag" round position="bottom">
-          <van-picker
-              :columns="tags"
-              :loading="tagLoading"
-              @cancel="showTag = false"
-              @confirm="pickTag"
+    <van-skeleton :loading="loading" row="5">
+      <van-form @submit="publish" class="content">
+        <van-cell-group inset>
+          <van-field
+              v-model="article.blogTitle"
+              name="title"
+              label="标题"
+              placeholder="标题"
+              :rules="[{ required: true, message: '请输入标题' }]"
           />
-        </van-popup>
-        <van-field
-            v-model="article.newTag"
-            name="newTag"
-            label="添加标签"
-            placeholder="标签"
-        />
-        <van-field
-            v-model="article.introduction"
-            rows="3"
-            name="ntroduction"
-            autosize
-            label="文章简介"
-            type="textarea"
-            maxlength="300"
-            placeholder="请输入简介"
-            show-word-limit
-            :rules="[{ required: true, message: '请填写简介' }]"
-        />
-        <md-editor
-            theme="dark"
-            v-model="article.markdown"
-            :toolbars="toolbars"
-            :preview="false"
-            @onUploadImg="uploadImage"
-            @onHtmlChanged="onHtmlChanged"
-        >
-        </md-editor>
-      </van-cell-group>
-      <div style="margin: 16px;">
-        <van-button :loading="publishing" loading-text="正在保存..." round block type="primary" native-type="submit">
-          保存
-        </van-button>
-      </div>
-    </van-form>
+          <van-field
+              v-model="article.tag"
+              name="tag"
+              is-link
+              readonly
+              label="标签"
+              placeholder="选择选择标签"
+              @click="showTag = true"
+              :rules="[{ required: true, message: '请选择标签' }]"
+          />
+          <van-popup v-model:show="showTag" round position="bottom">
+            <van-picker
+                :columns="tags"
+                :loading="tagLoading"
+                @cancel="showTag = false"
+                @confirm="pickTag"
+            />
+          </van-popup>
+          <van-field
+              v-model="article.newTag"
+              name="newTag"
+              label="添加标签"
+              placeholder="标签"
+          />
+          <van-field
+              v-model="article.introduction"
+              rows="3"
+              name="sign"
+              autosize
+              label="文章简介"
+              type="textarea"
+              maxlength="300"
+              placeholder="请输入简介"
+              show-word-limit
+              :rules="[{ required: true, message: '请填写简介' }]"
+          />
+          <md-editor
+              theme="dark"
+              v-model="article.markdown"
+              :toolbars="toolbars"
+              :preview="false"
+              @onUploadImg="uploadImage"
+              @onHtmlChanged="onHtmlChanged"
+          >
+          </md-editor>
+        </van-cell-group>
+        <div style="margin: 16px;">
+          <van-button :loading="publishing" loading-text="正在保存..." round block type="primary" native-type="submit">
+            保存
+          </van-button>
+        </div>
+      </van-form>
+    </van-skeleton>
   </div>
 </template>
 
@@ -69,12 +71,14 @@
 import MdEditor from "md-editor-v3";
 import "md-editor-v3/lib/style.css";
 import _ from "lodash";
-import {handleUploadResponse, success, warning} from "@/common";
+import {warning, success,handleUploadResponse} from "@/common";
 
 export default {
-  name: "PublishArticleView",
+  name: "EditArticleView",
+  components: {MdEditor},
   data() {
     return {
+      id: null,
       article: {},
       publishing: false,
       tagLoading: true,
@@ -101,11 +105,19 @@ export default {
       ],
       tags: [],
       showTag: false,
+      loading: true,
     }
   },
-  components: {MdEditor},
   async mounted() {
+    let id = this.$route.params.id;
+    if (_.isEmpty(id)) {
+      warning("缺失参数");
+      return;
+    }
+    this.id = id;
+    await this.loadArticle();
     await this.loadTags();
+    this.loading = false;
   },
   methods: {
     /**
@@ -129,6 +141,7 @@ export default {
       this.publishing = true;
       values.markdown = this.article.markdown;
       values.blogContents = this.article.blogContents;
+      values.id = this.article.id;
       let formData = new FormData();
       for (let item in values) {
         formData.append(item, values[item]);
@@ -197,6 +210,13 @@ export default {
       this.tags = tags;
       this.tagLoading = false;
     },
+    /**
+     * 加载文章详情
+     * */
+    async loadArticle() {
+      let response = await fetch(`https://localhost:37701/Article/Detail/${this.id}`);
+      this.article = await this.$handleResponse(response);
+    }
   }
 }
 </script>

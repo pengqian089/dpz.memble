@@ -3,6 +3,7 @@ import SettingsView from '../views/SettingsView.vue';
 import ArticleView from "../views/ArticleView.vue";
 import MumbleView from "../views/MumbleView.vue";
 import TimelineView from "../views/TimelineView.vue";
+import EditArticleView from "@/views/EditArticleView";
 import PublishArticleView from "@/views/PublishArticleView";
 import PublishTimeline from "@/views/PublishTimelineView";
 import EditTimelineView from "@/views/EditTimelineView";
@@ -27,11 +28,19 @@ const routes = [
         }
     },
     {
-        path: '/article/publish/:id',
+        path: '/article/edit/:id',
+        name: "edit-article",
+        component: EditArticleView,
+        meta: {
+            title: "编辑文章"
+        }
+    },
+    {
+        path: '/article/publish',
         name: "publish-article",
         component: PublishArticleView,
         meta: {
-            title: "发表文章"
+            title: "发布文章"
         }
     },
     {

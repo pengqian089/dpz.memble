@@ -24,7 +24,11 @@
                   @confirm="pickTag"
               />
             </van-popup>
-            <van-button type="primary" size="large" @click="loadArticles">查询</van-button>
+            <div class="query-action">
+              <van-button type="success" @click="this.$router.push({name:'publish-article'})">发布文章</van-button>
+              <van-button type="primary" @click="loadArticles">查询</van-button>
+            </div>
+
           </van-cell-group>
         </van-collapse-item>
       </van-collapse>
@@ -95,12 +99,8 @@ export default {
     showMarkdown(article) {
       article.isShowMk = article.isShowMk ? !article.isShowMk : true;
     },
-    // showHtml(article){
-    //   article.isShowHtml = article.isShowHtml ? !article.isShowHtml : true;
-    // }
-
     editArticle(article) {
-      this.$router.push({name: `publish-article`, params: {id: article.id}});
+      this.$router.push({name: `edit-article`, params: {id: article.id}});
     },
     async deleteArticle(article) {
       await Dialog.confirm({title: "提示", message: `删除后不可恢复，确定要删除《${article.blogTitle}》吗？`});
