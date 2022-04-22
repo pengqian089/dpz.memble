@@ -116,7 +116,8 @@
 </template>
 
 <script>
-import {Notify, Toast, Dialog} from "vant";
+import {Dialog, Toast} from "vant";
+import {success, warning} from "@/common";
 
 export default {
   name: "SettingsView",
@@ -128,108 +129,64 @@ export default {
       changing: false,
       signOuting: false,
       active: 0,
-      userInfo: {
-        // avatar: "https://localhost:37701/Home/Image/625e9fa9dd0b89c478183cb9",
-        // enable: false,
-        // id: "pengqian",
-        // key: "7451894ca9ca4b0b85f57d07989523d2",
-        // lastAccessTime: "2022-04-06T14:03:35",
-        // name: "被打断de狗腿",
-        // permissions: 2,
-        // sex: "0",
-        // sign: "社恐的阿胖"
-      },
+      userInfo: {},
       pwd: {}
     };
   },
   mounted() {
     this.$nextTick(async function () {
-      let that = this;
-
-      let response = await fetch("https://localhost:37701/account/GetUserInfo");
-      that.isLoading = false;
-      if (response.ok) {
-        let data = await response.json();
-        that.userInfo = data.data;
-        that.userInfo.sex = data.data.sex.toString();
-      } else {
-        Notify({type: "warning", message: response.statusText});
-      }
-
+      await this.getUserInfo();
     });
   },
   methods: {
-    back() {
-      history.back()
-    },
+    /**
+     * 保存用户信息
+     * */
     async saveInfo(values) {
       let formData = new FormData();
       for (let item in values) {
         formData.append(item, values[item]);
       }
       this.saving = true;
-      try {
-        let response = await fetch("/account/UpdateInfo", {
-          method: "post",
-          body: formData
-        });
-        if (response.ok) {
-          let data = await response.json();
-          if (data.success) {
-            Notify({type: 'primary', message: 'success'});
-          } else {
-            Notify({type: 'warning', message: data.msg});
-          }
-        } else {
-          Notify({type: "warning", message: response.statusText});
-        }
-      } catch (e) {
-        Notify({type: "warning", message: e.toString()});
-      }
+      let response = await fetch("/account/UpdateInfo", {
+        method: "post",
+        body: formData
+      });
+      let that = this;
+      await this.$handleResponse(response,() => that.saving = false);
+      success("信息更新成功");
       this.saving = false;
     },
+    /**
+     * 修改密码
+     * */
     async changePassword(values) {
       this.changing = true;
       let formData = new FormData();
       for (let item in values) {
         formData.append(item, values[item]);
       }
-      try {
-        let response = await fetch("/account/ChangePassword", {
-          method: "post",
-          body: formData
-        });
-        if (response.ok) {
-          let data = await response.json();
-          if (data.success) {
-            Notify({type: 'primary', message: 'success'});
-          } else {
-            Notify({type: 'warning', message: data.msg});
-          }
-        } else {
-          Notify({type: "warning", message: response.statusText});
-        }
-      } catch (e) {
-        Notify({type: "warning", message: e.toString()});
-      }
-
+      let response = await fetch("/account/ChangePassword", {
+        method: "post",
+        body: formData
+      });
+      let that = this;
+      await this.$handleResponse(response, () => that.changing = false);
+      success("密码修改成功");
       this.pwd = {};
       this.changing = false;
-
     },
-
     /*
     * 上传头像前的校验
+    * @param {File} file
     * */
     uploadAvatarBefore(file) {
-      console.log(file);
       if (!file.type.startsWith("image")) {
         Toast('请上传图片');
         return false;
       }
       return true;
     },
-
     /**
      * 上传头像
      * @param {File} file
@@ -242,20 +199,15 @@ export default {
         method: "post",
         body: formData
       });
-      if (response.ok) {
-        let data = await response.json();
-        if (data.success) {
-          this.userInfo.avatar = data.data;
-          Notify({type: "primary", message: "头像更新成功"});
-        } else {
-          Notify({type: "warning", message: data.msg});
-        }
-      } else {
-        Notify({type: "warning", message: response.statusText});
-      }
-      this.uploading = false;
-    },
 
+      let that = this;
+      this.userInfo.avatar = await this.$handleResponse(response, () => that.uploading = false);
+      this.uploading = false;
+      success("头像更新成功");
+    },
+    /**
+     * 退出账号
+     * */
     async signOut() {
       await Dialog.confirm({
         title: '提示',
@@ -268,9 +220,19 @@ export default {
       if (response.ok) {
         location.href = "/";
       } else {
-        Notify({type: "warning", message: response.statusText});
+        warning(response.statusText);
       }
       this.signOuting = false;
+    },
+    /**
+     * 获取用户信息
+     * */
+    async getUserInfo() {
+      this.isLoading = true;
+      let response = await fetch("https://localhost:37701/account/GetUserInfo");
+      this.userInfo = await this.$handleResponse(response);
+      this.userInfo.sex = this.userInfo.sex.toString();
+      this.isLoading = false;
     }
   }
 }
