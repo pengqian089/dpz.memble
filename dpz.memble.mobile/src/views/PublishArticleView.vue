@@ -4,15 +4,15 @@
     <van-form @submit="publish" class="content">
       <van-cell-group inset>
         <van-field
-            v-model="article.blogTitle"
-            name="blogTitle"
+            v-model="article.title"
+            name="title"
             label="标题"
             placeholder="标题"
             :rules="[{ required: true, message: '请输入标题' }]"
         />
         <van-field
-            v-model="article.tag"
-            name="tag"
+            v-model="article.tags"
+            name="tags"
             is-link
             readonly
             label="标签"
@@ -148,7 +148,7 @@ export default {
      * */
     pickTag(selected) {
       this.showTag = false;
-      this.article.tag = selected.selectedOptions[0].text;
+      this.article.tags = selected.selectedOptions[0].text;
     },
     /**
      * 上传文章相关图片

@@ -9,6 +9,7 @@ import PublishTimeline from "@/views/PublishTimelineView";
 import EditTimelineView from "@/views/EditTimelineView";
 import EditMumbleView from "@/views/EditMumbleView";
 import PublishMumbleView from "@/views/PublishMumbleView";
+import ActiveView from "@/views/ActiveView";
 
 const routes = [
     {
@@ -89,6 +90,14 @@ const routes = [
         component: EditTimelineView,
         meta: {
             title: "修改时间轴"
+        }
+    },
+    {
+        path: "/test",
+        name: "test",
+        component: ActiveView,
+        meta: {
+            title: "代码编辑器测试"
         }
     }
 ];

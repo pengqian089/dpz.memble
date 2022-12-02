@@ -10,12 +10,12 @@
       </van-button>
       <van-button :disabled="btnClear" @click="onClear" type="primary">清除录音</van-button>
       <van-button :disabled="btnUpload" @click="onUploadAudio" type="primary">上传录音</van-button>
-      <van-button @click="save" type="primary">保存录音</van-button>
     </div>
     <van-form @submit="publish" class="content">
       <van-cell-group inset>
         <md-editor
             theme="dark"
+            ref="editorRef"
             v-model="mumble.markdown"
             :toolbars="toolbars"
             :preview="false"
@@ -198,10 +198,18 @@ export default {
         that.btnClear = true;
         that.btnUpload = true;
       });
+
+
+      this.$refs.editorRef.insert(() => {
+        return {
+          targetValue: `<audio controls src="${result["accessUrl"]}" preload="metadata"></audio>`,
+          select: true,
+          deviationStart: 0,
+          deviationEnd: 0
+        };
+      });
+
       console.log(result);
-    },
-    save(){
-      record.saveAs();
     }
   }
 }

@@ -170,39 +170,27 @@ export const record = {
     /**
      * 上传录音
      * @param {function} uploadComplete 录音上传完成回调函数
-     * @return {string} 音频地址
+     * @return {Promise.<string>} 音频地址
      * */
     async uploadAudio(uploadComplete = null) {
         if (audioChunks.length === 0) return Promise.reject("没有获取到音频");
-        const audioBlob = new Blob(audioChunks);
-        let form = new FormData();
-        form.append("record", audioBlob, `${new Date().getTime()}.wav`);
-        let response = await fetch("/Audio/Upload", {
-            method: "post",
-            body: form
-        });
+        try {
+            const audioBlob = new Blob(audioChunks);
+            let form = new FormData();
+            form.append("record", audioBlob, `${new Date().getTime()}.wav`);
+            let response = await fetch("/Audio/Upload", {
+                method: "post",
+                body: form
+            });
 
-        let result = await handleResponse(response);
-        if (typeof (uploadComplete) === "function") {
-            uploadComplete();
+            let result = await handleResponse(response);
+            if (typeof (uploadComplete) === "function") {
+                uploadComplete();
+            }
+            return Promise.resolve(result);
+        }catch (e){
+            return Promise.reject(e.toString());
         }
-        return Promise.resolve(`/Audio/Result/${result.id}`);
-
-        // if(response.ok) {
-        //     let result = await response.json();
-        //     if (result.success) {
-        //         if (typeof (uploadComplete) === "function") {
-        //             uploadComplete();
-        //         }
-        //         return Promise.resolve(`/Audio/Result/${result.data.id}`);
-        //     }else{
-        //         warning(result.msg);
-        //         return Promise.reject(result.msg);
-        //     }
-        // }else {
-        //     warning(response.statusText);
-        //     return Promise.reject(response.statusText);
-        // }
     },
     saveAs(){
         if (audioChunks.length === 0) return Promise.reject("没有获取到音频");

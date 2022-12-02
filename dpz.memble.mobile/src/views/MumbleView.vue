@@ -23,7 +23,7 @@
           :finished="true"
           v-for="item in list" :key="item.id"
       >
-        <van-cell title="点赞次数" :value="item.zan"/>
+        <van-cell title="点赞次数" :value="item.like"/>
         <van-cell title="回复量" :value="item.commentCount"/>
         <van-cell title="发布时间" :value="item.createTime"/>
         <van-cell title="最后修改时间" :value="item.lastUpdateTime"/>

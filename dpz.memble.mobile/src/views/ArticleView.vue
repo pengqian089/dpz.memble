@@ -43,16 +43,12 @@
           :finished="true"
           v-for="item in list" :key="item.id"
       >
-        <van-cell title="标题" is-link :value="item.blogTitle" :url="`/article/read/${item.id}.html`"/>
+        <van-cell title="标题" is-link :value="item.title" :url="`/article/read/${item.id}.html`"/>
         <van-cell title="回复量" :value="item.commentCount"/>
         <van-cell title="访问次数" :value="item.viewCount"/>
         <van-cell title="标签" :value="item.tag"/>
         <van-cell title="发布时间" :value="item.createTime"/>
         <van-cell title="最后修改时间" :value="item.lastUpdateTime"/>
-        <van-cell title="Markdown" is-link :value="item.isShowMk === true ? '收起' : '展开'" @click="showMarkdown(item)"/>
-        <div :style="{display:(item.isShowMk === true ? 'block' : 'none')}">
-          <pre><code class="language-markdown line-numbers match-braces">{{ item.markdown }}</code></pre>
-        </div>
         <div class="van-cell">
           <div class="van-cell__title">
             <van-button type="primary" @click="editArticle(item)">修改</van-button>
@@ -139,6 +135,7 @@ export default {
       for (let item of result.list) {
         item.lastUpdateTime = dayjs(item.lastUpdateTime).format("YYYY年MM月DD日 HH:mm:ss");
         item.createTime = dayjs(item.createTime).format("YYYY年MM月DD日 HH:mm:ss");
+        item.tag = item.tags.join(";");
         item.isLocalTime = true;
       }
       this.list = result.list;
