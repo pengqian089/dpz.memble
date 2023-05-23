@@ -105,6 +105,27 @@
 
       </van-tab>
 
+      <van-tab title="解绑二次验证">
+        <van-form @submit="unbindTwoFactor" class="content">
+          <van-cell-group inset>
+            <van-field
+                v-model="pinCode"
+                name="id"
+                label="PIN码"
+                maxlength="6"
+                placeholder="PIN码"
+                :rules="[{ required: true, message: '请输入PIN码' }]"
+            />
+          </van-cell-group>
+          <div style="margin: 16px;">
+            <van-button :loading="unbinding" loading-text="正在解绑..." round block type="primary" native-type="submit">
+              解绑
+            </van-button>
+          </div>
+        </van-form>
+
+      </van-tab>
+
       <van-tab title="退出">
         <div class="content">
           <van-button type="primary" size="large" :loading="signOuting" @click="signOut">退出账号</van-button>
@@ -130,7 +151,9 @@ export default {
       signOuting: false,
       active: 0,
       userInfo: {},
-      pwd: {}
+      pwd: {},
+      unbinding: false,
+      pinCode: ""
     };
   },
   mounted() {
@@ -153,7 +176,7 @@ export default {
         body: formData
       });
       let that = this;
-      await this.$handleResponse(response,() => that.saving = false);
+      await this.$handleResponse(response, () => that.saving = false);
       success("信息更新成功");
       this.saving = false;
     },
@@ -230,15 +253,35 @@ export default {
       this.isLoading = true;
       let response = await fetch("/account/GetUserInfo");
       let that = this;
-      this.userInfo = await this.$handleResponse(response,() => that.isLoading = false);
+      this.userInfo = await this.$handleResponse(response, () => that.isLoading = false);
       this.userInfo.sex = this.userInfo.sex.toString();
       this.isLoading = false;
     },
     /**
      * 回到首页
      * */
-    toHome(){
+    toHome() {
       location.href = "/";
+    },
+    /*
+    * 解绑二次验证
+    * */
+    async unbindTwoFactor() {
+      let formData = new FormData();
+      formData.append("pinCode", this.pinCode);
+      this.unbinding = true;
+      let response = await fetch("/unbind-two-factor", {
+        method: "post",
+        body: formData
+      });
+      let that = this;
+      function clear(){
+        that.pinCode = "";
+        that.unbinding = false;
+      }
+      await this.$handleResponse(response, () => clear());
+      success("解绑成功");
+      clear();
     }
   }
 }
